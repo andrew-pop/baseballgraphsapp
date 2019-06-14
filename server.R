@@ -1,0 +1,89 @@
+library(dplyr)
+library(ggplot2)
+#library(baseballr)
+library(shiny)
+library(shinydashboard)
+library(shinythemes)
+
+o<-read.csv('pit_2018.csv')
+
+h<-read.csv('h.csv')
+
+h<-h[-1]
+
+z<-h
+
+z<-filter(z, AB >=25)
+
+z<-rename(z, 'Swing_and_Miss_%' = Swing_and_Miss_.)
+z<-rename(z, 'Strikeout_%' = Strikeout_.)
+z<-rename(z, 'wRC+' = wRC.)
+z<-rename(z, 'LineDrive_%' = LineDrive_.)
+z<-rename(z, 'BB_%' = BB_.)
+z<-rename(z, 'FlyBall_%' = FlyBall_.)
+z<-rename(z, 'GroundBall_%' = GroundBall_.)
+z<-rename(z, 'InsideSwing_%' = InsideSwing_.)
+z<-rename(z, 'OutsideSwing_%' = OutsideSwing_.)
+z<-rename(z, 'HardHit_%' = HardHit_.)
+z<-rename(z, 'Swing_%' = Swing_.)
+z<-rename(z, 'SoftHit_%' = SoftHit_.)
+
+stats<-c(
+  'Swing and Miss %' = 'Swing_and_Miss_%',
+  'Strikeout %' = 'Strikeout_%',
+  'Games Played' = 'G',
+  'At-Bats' = 'AB',
+  'Wins Above Replacement' = 'WAR',
+  'wRC+' = 'wRC+',
+  'Home Runs' = 'HR',
+  'Walk %' = 'BB_%',
+  'Line Drive %' = 'LineDrive_%',
+  'Ground Ball %' = 'GroundBall_%',
+  'Fly Ball %' = 'FlyBall_%',
+  'Outside Swing %' = 'OutsideSwing_%',
+  'Inside Swing %' = 'InsideSwing_%',
+  'Swing %' = 'Swing_%',
+  'Hard hit %' = 'HardHit_%',
+  'Soft hit %' = 'SoftHit_%'
+)
+
+x<-unique(h$Team)
+y<-as.character(x)
+
+
+server<-function(input, output, session) ({
+  #h%>% filter(Team == input$teams)
+  
+  
+  dfInput <-reactive({  
+    
+    subset(z, AB >= input$ab & Team %in% input$teams | Name %in% input$names)
+    #subset(h, Name %in% input$names)
+  })
+  
+  
+  output$Baseball<-renderPlot({
+    df1<-dfInput()
+    ggplot()+
+      geom_point(data=z, aes(x=z[,input$x], y=z[,input$y]), color='grey')+
+      geom_text(data = df1, aes(x=df1[,input$x],y=df1[,input$y], label = Name),hjust=.5, vjust=-.5, size=3)+
+      xlab(names(stats[which(stats == input$x)]))+
+      ylab(names(stats[which(stats == input$y)]))+
+      theme_bw()+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  })
+  basedata <- reactive({
+    subset(o, IP>= input$ip & Team %in% input$teams | Name %in% input$names)
+  })
+  output$Baseball_2<-renderPlot({
+    df2<-basedata
+    ggplot()+
+      geom_point(data=o, aes(x=o[,input$x], y=o[,input$y]), color='grey')+
+      geom_text(data = df2, aes(x=df2[,input$x],y=df2[,input$y], label = Name),hjust=.5, vjust=-.5, size=3)+
+      theme_bw()+
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+  })
+  output$view<-renderDataTable(dfInput(),options = list(pageLength=10,width='100%', scrollX=TRUE))
+  
+  
+})
