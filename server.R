@@ -1,13 +1,13 @@
 library(dplyr)
 library(ggplot2)
-#library(baseballr)
 library(shiny)
 library(shinydashboard)
 library(shinythemes)
+library(shinywidgets)
 
-o<-read.csv('pit_2018.csv')
+pitch_data<-read.csv('pbp.csv')  <-------------- ###### Read in Baseball Savant Data #######
 
-h<-read.csv('h.csv')
+h<-read.csv('h.csv')    <-------------- ######### Read in Fangraphs Data #######
 
 h<-h[-1]
 
@@ -53,13 +53,13 @@ y<-as.character(x)
 
 
 server<-function(input, output, session) ({
-  #h%>% filter(Team == input$teams)
+  
   
   
   dfInput <-reactive({  
     
     subset(z, AB >= input$ab & Team %in% input$teams | Name %in% input$names)
-    #subset(h, Name %in% input$names)
+    
   })
   
   
