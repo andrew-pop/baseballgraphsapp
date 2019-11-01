@@ -7,7 +7,7 @@ library(shinythemes)
 
 o<-read.csv('pit_2018.csv')
 
-h<-read.csv('h.csv') ###### data is from Fangraphs#####
+h<-read.csv('h.csv')
 
 h<-h[-1]
 
@@ -51,6 +51,7 @@ x<-unique(h$Team)
 y<-as.character(x)
 
 
+
 server<-function(input, output, session) ({
   #h%>% filter(Team == input$teams)
   
@@ -73,17 +74,27 @@ server<-function(input, output, session) ({
       theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
   })
   basedata <- reactive({
-    subset(o, IP>= input$ip & Team %in% input$teams | Name %in% input$names)
+    
+    filter(pitch_data, player_name==input$pitcher)
   })
+  
   output$Baseball_2<-renderPlot({
-    df2<-basedata
-    ggplot()+
-      geom_point(data=o, aes(x=o[,input$x], y=o[,input$y]), color='grey')+
-      geom_text(data = df2, aes(x=df2[,input$x],y=df2[,input$y], label = Name),hjust=.5, vjust=-.5, size=3)+
+    df2<- basedata()
+    ggplot(data=df2, aes(x=game_date, y=pitch_perc, group=pitch_type))+
+      geom_line(aes(colour=pitch_type),size=2)+
+      scale_y_continuous(limits=c(0, 100), breaks=seq(0,100, by=5))+
+      theme(axis.text.x = element_text(angle = 90))+
       theme_bw()+
-      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+            axis.text.x=element_text(angle=90))+
+      ggtitle(names(stats[which(stats == input$pitcher)]))+
+      xlab('Game Date')+
+      ylab('Pitch Percentage')
   })
-  output$view<-renderDataTable(dfInput(),options = list(pageLength=10,width='100%', scrollX=TRUE))
+  output$view<-renderDataTable(dfInput()#,options = list(pageLength=10,width='100%', scrollX=TRUE)
+                               )
+  
   
   
 })
+
