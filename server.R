@@ -7,7 +7,7 @@ library(shinythemes)
 
 o<-read.csv('pit_2018.csv')
 
-h<-read.csv('h.csv')
+h<-read.csv('h.csv') ###### data is from Fangraphs#####
 
 h<-h[-1]
 
