@@ -3,7 +3,7 @@ library(ggplot2)
 library(shiny)
 library(shinydashboard)
 library(shinythemes)
-library(shinywidgets)
+library(shinyWidgets)
 
 pitch_data<-read.csv('pbp.csv')  <-------------- ###### Read in Baseball Savant Data #######
 
