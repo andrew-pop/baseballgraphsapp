@@ -1,15 +1,14 @@
 library(dplyr)
 library(ggplot2)
-library(baseballr)
+#library(baseballr)
 library(shiny)
 library(shinydashboard)
 library(shinythemes)
 library(shinyWidgets)
-library(tibble)
 
-o<-read.csv(------)
+pitch_data<-read.csv('pbp.csv')  <-------------- ###### Read in Baseball Savant Data #######
 
-h<-read.csv(----)
+h<-read.csv('h.csv')    <-------------- ######### Read in Fangraphs Data #######
 
 h<-h[-1]
 
@@ -62,12 +61,11 @@ ui<-dashboardPage( skin = 'red',
                                 badgeColor = 'green',
                                 icon=icon('baseball-ball')
                        ),
-                       sliderInput("ab", 'Minimum Number of At-bats', 1,600,1),downloadButton('save_hit', 'save'),
+                       sliderInput("ab", 'Minimum Number of At-bats', 1,600,1),
                        menuItem('Pitcher',
                                 tabName = 'Pitcher',
                                 icon=icon('baseball-ball')
-                       ),
-                       sliderInput("ip", 'Minimum Number of Innings Pitched', 1,150,20), downloadButton('save_pit', 'save')
+                       )
                      )
                    ),
                    dashboardBody(
@@ -80,17 +78,14 @@ ui<-dashboardPage( skin = 'red',
                                 box( title = 'Coordinates', solidHeader = TRUE, status = 'danger',
                                      selectInput('x', 'X Axis', choices = colnames(z), selected = 'wRC+'),
                                      selectInput('y', 'Y Axis', choices = colnames(z), selected = 'WAR')),
-                                box( title = 'Graph', solidHeader = TRUE, status = 'danger', width = 12, plotOutput('Baseball')),
-                                box( title = 'Data Frame', solidHeader = TRUE, status = 'danger', width = 12, dataTableOutput('view'))
+                                box( title = 'Graph', solidHeader = TRUE, status = 'danger', width = 12, plotOutput('Baseball'))
+                                ,box( title = 'Data Frame', solidHeader = TRUE, status = 'danger', width = 12, dataTableOutput('view'))
                        ),
                        tabItem( tabName='Pitcher',
                                 box( title = 'Filter', solidHeader = TRUE, status = 'danger',
-                                     selectInput('pitcher', 'Choose a Pitcher', choices = unique(o$Name), multiple = TRUE),
-                                     selectInput('tm', 'Choose a Team', choices = unique(o$Team), multiple = TRUE)),
-                                box( title = 'Coordinates', solidHeader = TRUE, status = 'danger',
-                                     selectInput('x', 'X Axis', choices = colnames(o), selected = 'wRC_plus'),
-                                     selectInput('y', 'Y Axis', choices = colnames(o), selected = 'WAR')),
-                                plotOutput('Baseball_2')
+                                     selectInput('pitcher', 'Choose a Pitcher', choices = unique(pitch_data$player_name))),
+                                box( title = 'Pitch Usage Percentage', solidHeader = TRUE, status = 'danger', width = 12, plotOutput('Baseball_2'))
+                                
                        )
                      )
                    )
